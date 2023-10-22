@@ -4,5 +4,8 @@
   "main": "index.js",
   "repository": "https://github.com/2inlee/NestJS.git",
   "author": "2inlee <kbs@kakao.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
