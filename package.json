@@ -1,0 +1,8 @@
+{
+  "name": "Nestjs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/2inlee/NestJS.git",
+  "author": "2inlee <kbs@kakao.com>",
+  "license": "MIT"
+}
