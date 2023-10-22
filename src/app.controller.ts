@@ -19,4 +19,9 @@ export class AppController {
   getUsers() {
     return 'Users Page';
   }
+
+  @Get('page')
+  getPages() {
+    return 'Pages Page';
+  }
 }
