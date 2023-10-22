@@ -16,8 +16,8 @@ interface Post {
   commentCount : number;
 }
  
-
-@Controller()
+// Controller 에 어떤 parameter를 붙이는 지 -> 해당 Class 의 모든 Endpoint의 prefix가 된다.
+@Controller('post')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
