@@ -2,48 +2,6 @@ import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, P
 import { PostsService } from './posts.service';
 import { NotFoundError } from 'rxjs';
 
-/**
- * author : string;
- * title : string;
- * content : string;
- * likeCount : number;
- * commentCount : number;
- */
-interface PostModel {
-  id : number;
-  author : string;
-  title : string;
-  content : string;
-  likeCount : number;
-  commentCount : number;
-}
-
-let posts : PostModel[] = [
-  {
-    id : 1,
-    author : 'newjeans_official',
-    title : 'newjeans minji',
-    content : 'hot newjeans',
-    likeCount : 1000000,
-    commentCount : 2000000,
-  },
-  {
-    id : 2,
-    author : 'newjeans_official',
-    title : 'newjeans hingi',
-    content : 'cool newjeans',
-    likeCount : 2000000,
-    commentCount : 3000000,
-  },
-  {
-    id : 3,
-    author : 'blackpink_official',
-    title : 'newjeans black',
-    content : 'cool black',
-    likeCount : 3000000,
-    commentCount : 4000000,
-  },
-];
 
 @Controller('posts')
 export class PostsController {
@@ -55,7 +13,7 @@ export class PostsController {
 
   @Get()
   getPosts(){
-    return posts;
+    return this.postsService.getAllPosts();
   }
 
   // 2) GET /posts/:id
@@ -63,13 +21,7 @@ export class PostsController {
   // 예를 들어 id = 1이면 id가 1인 post를 가져온다.
   @Get(':id')
   getPost(@Param('id') id: string){
-    const post =  posts.find(post => post.id === +id);
-
-    if(!post){
-      throw new NotFoundException(`Post with id ${id} not found`);
-    }
-
-    return post;
+    return this.postsService.getPostById(+id);
   }
 
   // 3) POST /posts
@@ -81,20 +33,7 @@ export class PostsController {
     @Body('title') title:string, 
     @Body('content') content:string,
   ){
-    const post : PostModel = {
-      id: posts[posts.length -1].id + 1,
-      author,
-      title,
-      content,
-      likeCount: 0, 
-      commentCount:0,
-    };
-    posts = [
-      ...posts,
-      post,
-    ];
-
-    return post;
+    return this.postsService.createPost(author, title, content);
   }
 
   // 4) PATCH /posts/:id
@@ -107,27 +46,7 @@ export class PostsController {
     @Body('title') title:string, 
     @Body('content') content:string,
   ){
-    const post = posts.find(post => post.id === +id);
-
-    if(!post){
-      throw new NotFoundException
-    }
-
-    if(author){
-      post.author
-    }
-
-    if(title){
-      post.title
-    }
-
-    if(content){
-      post.content
-    }
-
-    posts = posts.map(prevPost => prevPost.id === +id ? post : prevPost)
-
-    return post;
+    return this.postsService.updatePost(+id, author, title, content);
   }
 
   // 5) DELETE /posts/:id
@@ -137,14 +56,6 @@ export class PostsController {
   deletePost(
     @Param('id') id: string,
     ){
-      const post = posts.find((post) => post.id === +id);
-      if(!post)
-      {
-        throw new NotFoundException();
-      }
-
-      posts = posts.filter(post => post.id !== +id);
-
-      return id;
+      return this.postsService.deletePost(+id)
     }
 }
