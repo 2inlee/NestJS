@@ -2,7 +2,7 @@ import { identity } from "rxjs";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class PostModel {
+export class PostsModel {
   
   @PrimaryGeneratedColumn()
   id : number;
