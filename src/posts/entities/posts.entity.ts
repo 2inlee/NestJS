@@ -1,8 +1,10 @@
-import { Column, Entity } from "typeorm";
+import { identity } from "rxjs";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class PostsModel {
-  @Column()
+export class PostModel {
+  
+  @PrimaryGeneratedColumn()
   id : number;
 
   @Column()
