@@ -1,16 +1,12 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { NotFoundError } from 'rxjs';
-
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-
   // 1) GET /posts
   // 모든 post를 가져온다.
-
   @Get()
   getPosts(){
     return this.postsService.getAllPosts();
