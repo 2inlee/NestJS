@@ -70,56 +70,70 @@ export class PostsService {
     return post;
     }
 
-  createPost(author: string, title: string, content: string){
-    const post : PostModel = {
-      id: posts[posts.length -1].id + 1,
+  async createPost(author: string, title: string, content: string){
+
+    // 1) create -> 저장할 객체를 생성한다.
+    // 2) save -> 저장할 객체를 저장한다.
+
+    const post = this.postsRepository.create({
       author,
       title,
       content,
-      likeCount: 0, 
-      commentCount:0,
-    };
-    posts = [
-      ...posts,
-      post,
-    ];
+      likeCount: 0,
+      commentCount: 0,
+    });
 
-    return post;
+    const newPost = await this.postsRepository.save(post);
+
+    return newPost;
   }
 
-  updatePost(id: number, author: string, title: string, content: string){
-    const post = posts.find(post => post.id === +id);
+  async updatePost(postId: number, author: string, title: string, content: string){
+    // save의 기능
+    // 1) 만약에 데이터가 존재하지 않는다면 id를 기준으로 데이터를 생성한다.
+    // 2) 만약에 데이터가 존재한다면 id를 기준으로 데이터를 수정한다.
+
+    const post = await this.postsRepository.findOne({
+      where: {
+        id:postId,
+      },
+    });
+
 
     if(!post){
       throw new NotFoundException
     }
 
     if(author){
-      post.author
+      post.author = author
     }
 
     if(title){
-      post.title
+      post.title = title
     }
 
     if(content){
-      post.content
+      post.content = content
     }
 
-    posts = posts.map(prevPost => prevPost.id === +id ? post : prevPost)
+    const newPost = await this.postsRepository.save(post);
 
-    return post;
+    return newPost;
   }
 
-  deletePost(id:number){
-    const post = posts.find((post) => post.id === +id);
-      if(!post)
-      {
-        throw new NotFoundException();
-      }
+  async deletePost(postId:number){
+    const post = await this.postsRepository.findOne({
+      where: {
+        id:postId,
+      },
+    });
 
-      posts = posts.filter(post => post.id !== +id);
+    if (!post){
+      throw new NotFoundException();
+    }
+    
+    await this.postsRepository.delete(postId);
 
-      return id;
+    return postId;
   }
 }
