@@ -25,25 +25,14 @@ export class PostsController {
 
   @Post() 
   postPosts(
-    @Body('author') author:string,
-    @Body('title') title:string, 
-    @Body('content') content:string,
+    @Body('authorId') authorId:number,
+    @Body('title') title?:string, 
+    @Body('content') content?:string,
   ){
-    return this.postsService.createPost(author, title, content);
+    return this.postsService.createPost(authorId, title, content);
   }
 
-  // 4) PATCH /posts/:id
-  // id에 해당되는 post를 수정한다.
 
-  @Put(':id')
-  putPost(
-    @Param('id') id:string,
-    @Body('author') author:string,
-    @Body('title') title:string, 
-    @Body('content') content:string,
-  ){
-    return this.postsService.updatePost(+id, author, title, content);
-  }
 
   // 5) DELETE /posts/:id
   // id에 해당되는 post를 삭제한다.
