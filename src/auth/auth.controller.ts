@@ -6,6 +6,20 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {
   }
  
+  @Post('token/access')
+  postTokenAccess(@Headers('authorization') rawToken: string) {
+    const token = this.authService.extractTokenFromHeader(rawToken, true);
+
+    /***
+     * 
+     * {accessToekn: {token}
+     */
+    const newToken = this.authService.rotateToken(token, false);
+
+    return {
+      accessToekn: newToken
+    };
+  }
   @Post('login/email')
   loginEamil(
     @Headers('authorization') rawToken: string,
@@ -26,5 +40,20 @@ export class AuthController {
     return this.authService.registerWithEmail({
       nickname, email, password
     });
+  }
+
+  @Post('toekn/referesh')
+  postToeknRefresh(@Headers('authorization') rawToken: string) {
+    const token = this.authService.extractTokenFromHeader(rawToken, true);
+
+    /***
+     * 
+     * {accessToekn: {token}
+     */
+    const newToken = this.authService.rotateToken(token, true);
+
+    return {
+      refreshToken: newToken
+    };
   }
 }

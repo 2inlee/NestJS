@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { PostsService } from './posts.service';
 
 @Controller('posts')
@@ -16,7 +16,7 @@ export class PostsController {
   // id에 해당되는 post를 가져온다
   // 예를 들어 id = 1이면 id가 1인 post를 가져온다.
   @Get(':id')
-  getPost(@Param('id') id: string){
+  getPost(@Param('id', ParseIntPipe) id: number){
     return this.postsService.getPostById(+id);
   }
 
