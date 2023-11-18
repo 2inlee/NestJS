@@ -69,7 +69,7 @@ export class AuthService {
      * 1. 사용자가 존재하는 지 확인 by email
      * 2. 비밀번호가 맞는 지 확인
      * 3. 모두 통과되면 사용자 정보 반환
-     */
+     */ 
     const existingUser = this.usersService.getUserByEmail(user.email);
 
     if(!existingUser){
@@ -91,4 +91,9 @@ export class AuthService {
     return existingUser;
   }
 
+  async loginWithEmail(user: Pick<UsersModel, 'email' | 'password'>) {
+   const existingUser = await this.authenticateWithEmailAndPassowrd(user);
+    return this.loginUser(existingUser);
+
+  }
 }
