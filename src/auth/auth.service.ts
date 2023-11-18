@@ -47,7 +47,18 @@ export class AuthService {
 
       return this.jwtService.sign(payload, {
         secret: JWT_SECRET,
-        expiresIn: isRefreshToken ? '3600' : '300',
+        //seconds
+        expiresIn: isRefreshToken ? 3600 : 300,
       });
+  }
+
+  loginUser(user: Pick<UsersModel, 'email' | 'id'>) {
+    const accessToken = this.signToken(user, false);
+    const refreshToken = this.signToken(user, true);
+
+    return {
+      accessToken,
+      refreshToken,
+    }
   }
 }
