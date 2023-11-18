@@ -1,6 +1,7 @@
-import { Body, Controller, Headers, Post } from '@nestjs/common';
+import { Body, Controller, Headers, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { MaxLengthPipe, MinLengthPipe, PasswordPipe } from './pipe/password.pipe';
+import { BasicTokenGuard } from './guard/basic-token.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -22,8 +23,10 @@ export class AuthController {
     };
   }
   @Post('login/email')
+  @UseGuards(BasicTokenGuard)
   loginEamil(
     @Headers('authorization') rawToken: string,
+    @Request() req,
     ) {
       //email, password -> base64
       // asdfadfajkdshfkahsdfkhd -> email:password
@@ -43,7 +46,7 @@ export class AuthController {
     });
   }
 
-  @Post('toekn/referesh')
+  @Post('toekn/refresh')
   postToeknRefresh(@Headers('authorization') rawToken: string) {
     const token = this.authService.extractTokenFromHeader(rawToken, true);
 
