@@ -37,14 +37,13 @@ export class AuthService {
    * 1) email
    * 2) sub -> id
    * 3) type -> access_token, refresh_token
-   * 
    *  */
     signToken(user: Pick<UsersModel, 'email' | 'id' >, isRefreshToken: boolean) {
       const payload = {
         email: user.email,
         sub: user.id,
         type: isRefreshToken ? 'refresh_token' : 'access_token',
-      };
+      }
 
       return this.jwtService.sign(payload, {
         secret: JWT_SECRET,
