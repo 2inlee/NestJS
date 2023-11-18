@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersModel } from 'src/users/entities/users.entity';
-import { JWT_SECRET } from './const/auth.const';
+import { HASH_ROUNDS, JWT_SECRET } from './const/auth.const';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 @Injectable()
@@ -96,4 +96,19 @@ export class AuthService {
     return this.loginUser(existingUser);
 
   }
+
+  async registerWithEmail(user: Pick<UsersModel, 'email' | 'password' | 'nickname'>) {
+    const existingUser = await this.usersService.getUserByEmail(user.email);
+
+    if(existingUser){
+      throw new Error('이미 존재하는 사용자입니다.');
+    }
+  
+    const hash = await bcrypt.hash(user.password, HASH_ROUNDS);
+
+    const newUser = await this.usersService.createUser(user);
+
+    return this.loginUser(newUser);
+  }
+
 }
