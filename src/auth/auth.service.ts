@@ -65,31 +65,26 @@ export class AuthService {
   }
 
   async authenticateWithEmailAndPassowrd(user: Pick<UsersModel, 'email' | 'password'>) {
-    /**
-     * 1. 사용자가 존재하는 지 확인 by email
-     * 2. 비밀번호가 맞는 지 확인
-     * 3. 모두 통과되면 사용자 정보 반환
-     */ 
-    const existingUser = this.usersService.getUserByEmail(user.email);
-
-    if(!existingUser){
+    // 사용자가 존재하는지 확인 by email
+    const existingUser = await this.usersService.getUserByEmail(user.email);
+  
+    // 사용자가 존재하지 않으면 에러 발생
+    if (!existingUser) {
       throw new Error('사용자가 존재하지 않습니다.');
     }
-
-    /**
-     * 파라미터
-     * 
-     * 1) 입력된 비밀번호
-     * 2) 기존 해시 -> 사용자 정보에 저장돼있는 해시
-     */
-    const passOk = await bcrypt.compare(user.password, (await existingUser).password);
-
+  
+    // 비밀번호가 맞는지 확인
+    const passOk = await bcrypt.compare(user.password, existingUser.password);
+  
+    // 비밀번호가 틀리면 에러 발생
     if (!passOk) {
       throw new Error('비밀번호가 일치하지 않습니다.');
     }
-
+  
+    // 모두 통과되면 사용자 정보 반환
     return existingUser;
   }
+  
 
   async loginWithEmail(user: Pick<UsersModel, 'email' | 'password'>) {
    const existingUser = await this.authenticateWithEmailAndPassowrd(user);
