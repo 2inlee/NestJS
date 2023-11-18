@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { HASH_ROUNDS, JWT_SECRET } from './const/auth.const';
@@ -42,18 +42,47 @@ export class AuthService {
    * {authorization" 'Bearer {token} '
    */
 
-  async extractTokenFromHeader(header: string, isBearer: boolean) {
+  extractTokenFromHeader(header: string, isBearer: boolean) {
     // 'Basic {token}'
     // [Basic, {token}]]
     // 'Bearer {token}'
     // [Bearer, {token}]]
     const splitToken = header.split(' ');
 
-    if(splitToken.length !== 2) {
-      throw new Error('토큰이 올바르지 않습니다.');
+    const prefix = isBearer ? 'Bearer' : 'Basic';
+
+    if(splitToken.length !== 2 || splitToken[0] !== prefix) {
+      throw new UnauthorizedException('토큰이 올바르지 않습니다.');
     }
 
     const token = splitToken[1];
+
+    return token;
+  }
+
+  /**
+   * Basic al:asdjhsjidfhjdjhfkjsddoas
+   * 
+   * 1) al:asdjhsjidfhjdjhfkjsddoas -> email:password
+   * 2) email:password -> [email, password]
+   * 3) {email:email, password:password}
+   */
+  decodeBasicToken(base64String: string) {
+    const decode = Buffer.from(base64String, 'base64').toString('utf-8');
+
+    const split = decode.split(':');
+
+    if(split.length !== 2) {
+      throw new UnauthorizedException('토큰이 올바르지 않습니다.');
+    }
+
+    const email = split[0];
+    const password = split[1];
+
+    return {
+      email,
+      password,
+    }
   }
   /**
    * 1) resisterWithEmail
