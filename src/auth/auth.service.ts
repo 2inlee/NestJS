@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { JWT_SECRET } from './const/auth.const';
-
+import { UsersService } from 'src/users/users.service';
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
   ) {}
   /**
    * 1) resisterWithEmail
@@ -38,18 +40,18 @@ export class AuthService {
    * 2) sub -> id
    * 3) type -> access_token, refresh_token
    *  */
-    signToken(user: Pick<UsersModel, 'email' | 'id' >, isRefreshToken: boolean) {
-      const payload = {
-        email: user.email,
-        sub: user.id,
-        type: isRefreshToken ? 'refresh_token' : 'access_token',
-      }
+  signToken(user: Pick<UsersModel, 'email' | 'id' >, isRefreshToken: boolean) {
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      type: isRefreshToken ? 'refresh_token' : 'access_token',
+    }
 
-      return this.jwtService.sign(payload, {
-        secret: JWT_SECRET,
-        //seconds
-        expiresIn: isRefreshToken ? 3600 : 300,
-      });
+    return this.jwtService.sign(payload, {
+      secret: JWT_SECRET,
+      //seconds
+      expiresIn: isRefreshToken ? 3600 : 300,
+    });
   }
 
   loginUser(user: Pick<UsersModel, 'email' | 'id'>) {
@@ -61,4 +63,32 @@ export class AuthService {
       refreshToken,
     }
   }
+
+  async authenticateWithEmailAndPassowrd(user: Pick<UsersModel, 'email' | 'password'>) {
+    /**
+     * 1. 사용자가 존재하는 지 확인 by email
+     * 2. 비밀번호가 맞는 지 확인
+     * 3. 모두 통과되면 사용자 정보 반환
+     */
+    const existingUser = this.usersService.getUserByEmail(user.email);
+
+    if(!existingUser){
+      throw new Error('사용자가 존재하지 않습니다.');
+    }
+
+    /**
+     * 파라미터
+     * 
+     * 1) 입력된 비밀번호
+     * 2) 기존 해시 -> 사용자 정보에 저장돼있는 해시
+     */
+    const passOk = await bcrypt.compare(user.password, (await existingUser).password);
+
+    if (!passOk) {
+      throw new Error('비밀번호가 일치하지 않습니다.');
+    }
+
+    return existingUser;
+  }
+
 }
