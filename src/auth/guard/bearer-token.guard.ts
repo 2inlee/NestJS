@@ -4,22 +4,32 @@ import { AuthService } from "../auth.service";
 import { UsersService } from "src/users/users.service";
 import { In } from "typeorm";
 
-export class BearerTokenGuard implements CanActivate{
-  constructor(private readonly authService: AuthService,
-    private readonly userService: UsersService) {}
+@Injectable()
+export class BearerTokenGuard implements CanActivate {
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UsersService
+  ) {}
+
+  private extractTokenFromHeader(authHeader: string): string {
+    if (!authHeader.startsWith('Bearer ')) {
+      throw new UnauthorizedException('잘못된 토큰 형식입니다.');
+    }
+    return authHeader.substring(7); // "Bearer "를 제외한 나머지 부분 반환
+  }
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
+    const rawToken = req.headers['authorization'];
 
-    const rawToken = req.headers('authorization');
-
-    if(!rawToken) {
+    if (!rawToken) {
       throw new UnauthorizedException('토큰이 없습니다.');
     }
 
-    const token = this.authService.extractTokenFromHeader(rawToken, true);
+    const token = this.extractTokenFromHeader(rawToken);
 
     const result = await this.authService.verifyToken(token);
-
+    
     /**
      * request에 넣을 정보
      * 
