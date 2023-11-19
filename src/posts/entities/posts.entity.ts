@@ -1,6 +1,7 @@
 import { IsString } from "class-validator";
 import { identity } from "rxjs";
 import { BaseModel } from "src/common/entity/base.entity";
+import { stringValidationMessage } from "src/common/validation-message/string-validation.message";
 import { UsersModel } from "src/users/entities/users.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
@@ -15,12 +16,12 @@ export class PostsModel extends BaseModel{
 
   @Column()
   @IsString({
-    message: '제목은 문자열로 입력해주세요.',
+    message: stringValidationMessage
   })
   title : string;
 
   @IsString({
-    message: '내용은 문자열로 입력해주세요.',
+    message: stringValidationMessage
   })
   @Column()
   content : string;

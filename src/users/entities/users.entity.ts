@@ -4,6 +4,9 @@ import { PostModel } from "src/posts/posts.service";
 import { PostsModel } from "src/posts/entities/posts.entity";
 import { BaseModel } from "src/common/entity/base.entity";
 import { IsEmail, IsString, Length } from "class-validator";
+import { lengthValidationMessage } from "src/common/validation-message/length-validation,message";
+import { stringValidationMessage } from "src/common/validation-message/string-validation.message";
+import { emailValidationMessage } from "src/common/validation-message/email-validation.message";
 
 @Entity()
 export class UsersModel extends BaseModel{
@@ -14,25 +17,25 @@ export class UsersModel extends BaseModel{
   })
 
   @Length(1, 20, {
-    message: '닉네임은 1~20자리로 입력해주세요.',
+    message:lengthValidationMessage,
   })
   @IsString({
-    message: '닉네임은 문자열로 입력해주세요.',
+    message: stringValidationMessage
   })
   nickname: string;
   
   @IsEmail()
   @IsString({
-    message: '이메일은 문자열로 입력해주세요.',
+    message: emailValidationMessage
   })
   @Column()
   email: string;
 
   @Length(3, 8, {
-    message: '비밀번호는 3~8자리로 입력해주세요.',
+    message:lengthValidationMessage,
   })
   @IsString({
-    message: '비밀번호는 문자열로 입력해주세요.',
+    message: stringValidationMessage
   })
   @Column()
   password: string;
