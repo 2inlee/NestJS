@@ -47,7 +47,7 @@ export class PostsController {
     }
 
   // 5) DELETE /posts/:id
-  // id에 해당되는 post를 삭제한다.
+  // id에 해당되는 post를 삭제한다. 
 
   @Delete(':id')
   deletePost(
