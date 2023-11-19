@@ -7,17 +7,15 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug NestJS",
+      "name": "debug run",
       "runtimeExecutable": "yarn",
       "runtimeArgs": [
         "start:debug"
       ],
       "console": "integratedTerminal",
       "restart": true,
-      "port":"9229",
-      "autoAttachChildProcesses": true,
-      
-      
+      "port": 9229,
+      "autoAttachChildProcesses": true
     }
   ]
 }

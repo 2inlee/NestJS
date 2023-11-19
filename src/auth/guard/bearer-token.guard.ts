@@ -1,8 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
-import { Observable } from "rxjs";
 import { AuthService } from "../auth.service";
 import { UsersService } from "src/users/users.service";
-import { In } from "typeorm";
 
 @Injectable()
 export class BearerTokenGuard implements CanActivate {
@@ -10,13 +8,6 @@ export class BearerTokenGuard implements CanActivate {
     private readonly authService: AuthService,
     private readonly userService: UsersService
   ) {}
-
-  private extractTokenFromHeader(authHeader: string): string {
-    if (!authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedException('잘못된 토큰 형식입니다.');
-    }
-    return authHeader.substring(7); // "Bearer "를 제외한 나머지 부분 반환
-  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
@@ -26,7 +17,7 @@ export class BearerTokenGuard implements CanActivate {
       throw new UnauthorizedException('토큰이 없습니다.');
     }
 
-    const token = this.extractTokenFromHeader(rawToken);
+    const token = this.authService.extractTokenFromHeader(rawToken, true);
 
     const result = await this.authService.verifyToken(token);
     
@@ -39,6 +30,7 @@ export class BearerTokenGuard implements CanActivate {
      */
 
     const user = await this.userService.getUserByEmail(result.email);
+    
     req.user = user;
     req.token = token;
     req.tokenType = result.type;
@@ -56,7 +48,7 @@ export class AccessTokenGuard extends BearerTokenGuard{
     const req = context.switchToHttp().getRequest();
 
     if(req.tokenType !== 'access') {
-      throw new UnauthorizedException('엑세스 토큰이 아닙니다.');
+      throw new UnauthorizedException('AccessToken이 아닙니다.');
     }
     return true;
   }
