@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { UsersModel } from './entities/users.entity';
@@ -10,6 +10,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   ],
   exports : [UsersService],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService]
 })
 export class UsersModule {}
