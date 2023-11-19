@@ -10,6 +10,7 @@ import { emailValidationMessage } from "src/common/validation-message/email-vali
 import { Exclude, Expose } from "class-transformer";
 
 @Entity()
+@Exclude()
 export class UsersModel extends BaseModel{
 
   @Column({
@@ -17,6 +18,7 @@ export class UsersModel extends BaseModel{
     unique: true,
   })
 
+  @Expose()
   @Length(1, 20, {
     message:lengthValidationMessage,
   })
@@ -26,10 +28,6 @@ export class UsersModel extends BaseModel{
   nickname: string;
 
   @Expose()
-  get nicknameAndEamil(){
-    return this.nickname + '/' + this.email;
-  }
-  
   @IsEmail()
   @IsString({
     message: emailValidationMessage
