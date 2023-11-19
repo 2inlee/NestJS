@@ -1,9 +1,9 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, Post, Put, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { User } from 'src/users/decorator/user.decorator';
-import { UsersModel } from 'src/users/entities/users.entity';
-import { createPostDto } from './dto/create-post.dto';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -31,12 +31,20 @@ export class PostsController {
   @UseGuards(AccessTokenGuard)
   postPosts(
     @User('id') userId: number,
-    @Body() body: createPostDto,
+    @Body() body: CreatePostDto,
   ){
     return this.postsService.createPost(userId, body);
   }
 
-
+  // 4) PATCH /posts/:id
+  // id에 해당되는 post를 수정한다.
+  @Patch(':id')
+  patchPost(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdatePostDto,
+    ){
+      return this.postsService.updatePost(id, body)
+    }
 
   // 5) DELETE /posts/:id
   // id에 해당되는 post를 삭제한다.

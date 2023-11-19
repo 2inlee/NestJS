@@ -1,3 +1,4 @@
+import { IsString } from "class-validator";
 import { identity } from "rxjs";
 import { BaseModel } from "src/common/entity/base.entity";
 import { UsersModel } from "src/users/entities/users.entity";
@@ -13,8 +14,14 @@ export class PostsModel extends BaseModel{
   author : UsersModel;
 
   @Column()
+  @IsString({
+    message: '제목은 문자열로 입력해주세요.',
+  })
   title : string;
 
+  @IsString({
+    message: '내용은 문자열로 입력해주세요.',
+  })
   @Column()
   content : string;
 
