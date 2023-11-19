@@ -40,7 +40,23 @@ export class UsersModel extends BaseModel{
     message: stringValidationMessage
   })
   @Column()
-  @Exclude()
+  /**
+   * Request
+   * frontend - > backend
+   * plain object (json)-> class instance (dto)
+   * 
+   * Response
+   * backend -> frontend
+   * class instance (dto) -> plain object (json)
+   * 
+   * toClassOnly -> class instance로 변환될 때만 (요청)
+   * toPlainOnly -> plain object로 변환될 때만 (응답)
+   */
+
+  // 아래와 같이 toPlainOnly: true를 설정하면 응답이 나갈때 비밀번호를 제외시킬 수 있다.
+  @Exclude({
+    toPlainOnly: true,
+  })
   password: string;
 
   @Column({
