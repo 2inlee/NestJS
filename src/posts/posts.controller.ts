@@ -5,6 +5,7 @@ import { User } from 'src/users/decorator/user.decorator';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { paginatePostDto } from './dto/paginate-post.dto';
+import { UsersModel } from 'src/users/entities/users.entity';
 
 @Controller('posts')
 export class PostsController {
@@ -19,6 +20,14 @@ export class PostsController {
     return this.postsService.paginatePosts(query);
   }
 
+  //Post /posts/random
+  @Post('random')
+  @UseGuards(AccessTokenGuard)
+  async postPostsRandom(@User() user: UsersModel){
+    await this.postsService.generatePosts(user.id);
+
+    return true;
+  }
   // 2) GET /posts/:id
   // id에 해당되는 post를 가져온다
   // 예를 들어 id = 1이면 id가 1인 post를 가져온다.
