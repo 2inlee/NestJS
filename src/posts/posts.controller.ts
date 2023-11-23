@@ -7,6 +7,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { paginatePostDto } from './dto/paginate-post.dto';
 import { UsersModel } from 'src/users/entities/users.entity';
 
+
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
@@ -59,7 +60,7 @@ export class PostsController {
     }
 
   // 5) DELETE /posts/:id
-  // id에 해당되는 post를 삭제한다. 
+  // id에 해당되는 post를 삭제한다.
 
   @Delete(':id')
   deletePost(
