@@ -104,13 +104,22 @@ export class PostsService {
       */
     for(const key of Object.keys(dto)){
      if(dto[key]){
-       if(key !== "where__id_more_than"){
+       if(key !== "where__id_more_than && key !== 'where__id_less_than'"){
         nextURL.searchParams.append(key, dto[key]);
       }
     }
   }
 
-  nextURL.searchParams.append('where__id_more_than', lastItem.id.toString());
+  let key = null;
+
+  if (dto.order__createAt === 'ASC'){
+    key = 'where__id_more_than';
+  }
+  else{
+    key = 'where__id_less_than';
+  }
+
+  nextURL.searchParams.append(key, lastItem.id.toString());
   /**
    * 
    * Response
