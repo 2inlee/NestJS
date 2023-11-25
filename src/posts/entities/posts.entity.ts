@@ -10,8 +10,9 @@ export class PostsModel extends BaseModel{
 
   // 1) UsersModel과 연동된다. 외래키 이용
   // 2) null 불가능
-  @ManyToOne(() => UsersModel, (user) => user.posts,
-  { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne(() => UsersModel, (user) => user.posts,{ 
+    nullable: false, onDelete: 'CASCADE' 
+  })
   author : UsersModel;
 
   @Column()
