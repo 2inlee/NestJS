@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThan, Repository } from 'typeorm';
+import { FindOptionsWhere, LessThan, MoreThan, Repository } from 'typeorm';
 import { PostsModel } from './entities/posts.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -74,74 +74,55 @@ export class PostsService {
 }
 
   // 1) 오름차 순으로 정렬하는 pagination만 구현한다.
-  async paginatePosts(dto: paginatePostDto){
-    // 1,2,3,4,5
+  async paginatePosts(dto: paginatePostDto) {
+    const where: FindOptionsWhere<PostsModel> = {};
+  
+    // 조건 설정
+    if (dto.where__id_less_than) {
+      where.id = LessThan(dto.where__id_less_than);
+    } else if (dto.where__id_more_than) {
+      where.id = MoreThan(dto.where__id_more_than);
+    }
+  
+    // 데이터베이스에서 게시물 조회
     const posts = await this.postsRepository.find({
-      where:{
-        //더 크다 / 더 많다
-        id : MoreThan(dto.where__id_more_than ?? 0),
-      },
-      order:{
+      where: where,
+      order: {
         createdAt: dto.order__createAt,
       },
       take: dto.take,
     });
-
-  // 해당되는 포스트가 0개 이상이면
-  // 마지막 포스트를 가져오고,
-  // 아니면 null을 반환한다.
-  const lastItem = posts.length > 0 && posts.length == dto.take ? posts[posts.length - 1] : null;
-
-  const nextURL = lastItem && new URL(`${PROTOCOL}://${HOST}/posts`);
-
-  if (nextURL){
-     /**
-      * dto의 키값들을 루핑하면서
-      * 키값에 해당되는 벨류가 존재하면
-      * param에 그대로 붙여넣는다.
-      * 
-      * 단, where__id_more_than 값만 listItem의 마지막 값으로 넣어준다.
-      */
-    for(const key of Object.keys(dto)){
-     if(dto[key]){
-       if(key !== "where__id_more_than && key !== 'where__id_less_than'"){
-        nextURL.searchParams.append(key, dto[key]);
+  
+    // 마지막 항목 설정
+    const lastItem = posts.length > 0 && posts.length == dto.take ? posts[posts.length - 1] : null;
+  
+    // 다음 URL 생성
+    const nextURL = lastItem ? new URL(`${PROTOCOL}://${HOST}/posts`) : null;
+  
+    if (nextURL) {
+      // 기존 파라미터를 URL에 추가
+      for (const key of Object.keys(dto)) {
+        if (dto[key] && key !== "where__id_more_than" && key !== "where__id_less_than") {
+          nextURL.searchParams.append(key, dto[key]);
+        }
       }
+  
+      // 새로운 where 조건 추가
+      let key = dto.order__createAt === 'ASC' ? 'where__id_more_than' : 'where__id_less_than';
+      nextURL.searchParams.append(key, lastItem.id.toString());
     }
-  }
-
-  let key = null;
-
-  if (dto.order__createAt === 'ASC'){
-    key = 'where__id_more_than';
-  }
-  else{
-    key = 'where__id_less_than';
-  }
-
-  nextURL.searchParams.append(key, lastItem.id.toString());
-  /**
-   * 
-   * Response
-   * 
-   * data: Data[]
-   * cursor: {
-   *   after: 마지막 Data의 id
-   * },
-   * count: 응답한 데이터의 갯수
-   * next: 다음 요청을 할 때 사용할 URL
-   */
-
-  return {
-    data: posts,
-    cursor: {
-      after: lastItem?.id ?? null,
-    },
-      count : posts.length,
-      next : nextURL?.toString() ?? null,
-      }
-    }  
-  }
+  
+    // 응답 반환
+    return {
+      data: posts,
+      cursor: {
+        after: lastItem?.id ?? null,
+      },
+      count: posts.length,
+      next: nextURL?.toString() ?? null,
+    }
+  }ㅇ
+  
   async getPostById(id: number){
     const post = await this.postsRepository.findOne({
       where: {
