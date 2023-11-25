@@ -110,10 +110,10 @@ export class PostsService {
     const where: FindOptionsWhere<PostsModel> = {};
   
     // 조건 설정
-    if (dto.where__id_less_than) {
-      where.id = LessThan(dto.where__id_less_than);
-    } else if (dto.where__id_more_than) {
-      where.id = MoreThan(dto.where__id_more_than);
+    if (dto.where__id__less_than) {
+      where.id = LessThan(dto.where__id__less_than);
+    } else if (dto.where__id__more_than) {
+      where.id = MoreThan(dto.where__id__more_than);
     }
   
     // 데이터베이스에서 게시물 조회
@@ -134,13 +134,13 @@ export class PostsService {
     if (nextURL) {
       // 기존 파라미터를 URL에 추가
       for (const key of Object.keys(dto)) {
-        if (dto[key] && key !== "where__id_more_than" && key !== "where__id_less_than") {
+        if (dto[key] && key !== "where__id__more_than" && key !== "where__id__less_than") {
           nextURL.searchParams.append(key, dto[key]);
         }
       }
   
       // 새로운 where 조건 추가
-      let key = dto.order__createAt === 'ASC' ? 'where__id_more_than' : 'where__id_less_than';
+      let key = dto.order__createAt === 'ASC' ? 'where__id__more_than' : 'where__id__less_than';
       nextURL.searchParams.append(key, lastItem.id.toString());
     }
   
