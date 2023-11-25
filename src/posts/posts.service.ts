@@ -83,6 +83,25 @@ export class PostsService {
   }
 
   async pagePaginatePosts(dto: paginatePostDto){
+    /**
+     * data: Data[]
+     * total: number
+     * next: ?? 일반적으로 UI에서 페이지 버튼이 나와있기 때문에 next가 필요없다.
+     * 
+     * [1] [2] [3] [4]
+     */
+    
+    const posts = await this.postsRepository.find({
+      take: dto.take, 
+      order: {
+        createdAt: dto.order__createAt,
+      },
+      skip: (dto.page - 1) * dto.take,
+    });
+
+    return {
+      data: posts,
+    }
   }
 
   
