@@ -91,16 +91,17 @@ export class PostsService {
      * [1] [2] [3] [4]
      */
     
-    const posts = await this.postsRepository.find({
-      take: dto.take, 
+    const [posts, count] = await this.postsRepository.findAndCount({
+      skip: (dto.page - 1) * dto.take,
+      take: dto.take,
       order: {
         createdAt: dto.order__createAt,
       },
-      skip: (dto.page - 1) * dto.take,
     });
 
     return {
       data: posts,
+      total: count,
     }
   }
 
