@@ -27,7 +27,18 @@ export class CommonService {
     overrideFindOptions: FindManyOptions<T>= {},
   
   ){
-    
+    const findOptions = this.composeFindOptions<T>(dto);
+
+    const [data, count] = await repository.findAndCount({
+      ...findOptions,
+      ...overrideFindOptions,
+    });
+
+    return {
+      data,
+      total: count,
+    }
+  
   }
 
   private async cursorPaginate<T extends BaseModel>(
@@ -51,7 +62,7 @@ export class CommonService {
     const lastItem = results.length > 0 && results.length == dto.take ? results[results.length - 1] : null;
   
     // 다음 URL 생성
-    const nextURL = lastItem ? new URL(`${PROTOCOL}://${HOST}/posts`) : null;
+    const nextURL = lastItem && new URL(`${PROTOCOL}://${HOST}/${path}`)
   
     if (nextURL) {
       // 기존 파라미터를 URL에 추가
@@ -110,7 +121,7 @@ export class CommonService {
      * 4) order의 경우 3-2)와 같이 적용한다.
      */ 
 
-    let where: FindOptionsWhere<T> = {};;
+    let where: FindOptionsWhere<T> = {};
     let order: FindOptionsOrder<T> = {};
 
     for(const [key, value] of Object.entries(dto)){

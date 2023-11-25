@@ -77,7 +77,7 @@ export class PostsService {
 
   // 1) 오름차 순으로 정렬하는 pagination만 구현한다.
   async paginatePosts(dto: paginatePostDto) {
-    return this.commonService.paginate<PostsModel>(
+    return this.commonService.paginate(
       dto,
       this.postsRepository,
       {},
