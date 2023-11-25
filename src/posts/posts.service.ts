@@ -70,11 +70,23 @@ export class PostsService {
         title: `임의로 생성된 포스트 제목 ${i}`,
         content: `임의로 생성된 포스트 내용 ${i}`,
       });
+    }
   }
-}
 
   // 1) 오름차 순으로 정렬하는 pagination만 구현한다.
   async paginatePosts(dto: paginatePostDto) {
+    if(dto.page){
+      return this.pagePaginatePosts(dto);
+    }else{
+      return this.cursorPaginatePosts(dto);
+    }
+  }
+
+  async pagePaginatePosts(dto: paginatePostDto){
+  }
+
+  
+  async cursorPaginatePosts(dto: paginatePostDto){
     const where: FindOptionsWhere<PostsModel> = {};
   
     // 조건 설정
@@ -121,7 +133,7 @@ export class PostsService {
       count: posts.length,
       next: nextURL?.toString() ?? null,
     }
-  }ㅇ
+  }
   
   async getPostById(id: number){
     const post = await this.postsRepository.findOne({
