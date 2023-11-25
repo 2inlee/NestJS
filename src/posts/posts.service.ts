@@ -126,10 +126,10 @@ export class PostsService {
   return {
     data: posts,
     cursor: {
-      after: lastItem?.id,
+      after: lastItem?.id ?? null,
     },
       count : posts.length,
-      next : nextURL?.toString(),
+      next : nextURL?.toString() ?? null,
       }
     }  
   }
