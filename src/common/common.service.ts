@@ -3,6 +3,7 @@ import { BasePaginationDto } from './dto/base-pagination.dto';
 import { FindManyOptions, FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
 import { BaseModel } from './entity/base.entity';
 import { FILTER_MAPPER } from './const/filter-mapper.const';
+import { HOST, PROTOCOL } from './const/env.const';
 
 @Injectable()
 export class CommonService {
@@ -40,6 +41,39 @@ export class CommonService {
      * 
      * where__title_ilike
      */
+    const findOptions = this.composeFindOptions<T>(dto);
+
+    const results = await repository.find({
+      ...findOptions,
+      ...overrideFindOptions,
+    });
+
+    const lastItem = results.length > 0 && results.length == dto.take ? results[results.length - 1] : null;
+  
+    // 다음 URL 생성
+    const nextURL = lastItem ? new URL(`${PROTOCOL}://${HOST}/posts`) : null;
+  
+    if (nextURL) {
+      // 기존 파라미터를 URL에 추가
+      for (const key of Object.keys(dto)) {
+        if (dto[key] && key !== "where__id__more_than" && key !== "where__id__less_than") {
+          nextURL.searchParams.append(key, dto[key]);
+        }
+      }
+  
+      // 새로운 where 조건 추가
+      let key = dto.order__createdAt === 'ASC' ? 'where__id__more_than' : 'where__id__less_than';
+      nextURL.searchParams.append(key, lastItem.id.toString());
+    }
+
+    return {
+      data : results,
+      cursor: {
+        after: lastItem?.id ?? null,
+      },
+      count: results.length,
+      next: nextURL?.toString() ?? null,
+    }
 
   }
   private composeFindOptions<T extends BaseModel>(

@@ -6,6 +6,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { paginatePostDto } from './dto/paginate-post.dto';
 import { HOST, PROTOCOL } from 'src/common/const/env.const';
+import { CommonService } from 'src/common/common.service';
 
 /**
  * author : string;
@@ -55,6 +56,7 @@ export class PostsService {
   constructor(
     @InjectRepository(PostsModel)
     private readonly postsRepository: Repository<PostsModel>,
+    private readonly commonService: CommonService,
   ){}
 
   async getAllPosts(){
@@ -75,11 +77,17 @@ export class PostsService {
 
   // 1) 오름차 순으로 정렬하는 pagination만 구현한다.
   async paginatePosts(dto: paginatePostDto) {
-    if(dto.page){
-      return this.pagePaginatePosts(dto);
-    }else{
-      return this.cursorPaginatePosts(dto);
-    }
+    return this.commonService.paginate<PostsModel>(
+      dto,
+      this.postsRepository,
+      {},
+      'posts',
+    );
+    // if(dto.page){
+    //   return this.pagePaginatePosts(dto);
+    // }else{
+    //   return this.cursorPaginatePosts(dto);
+    // }
   }
 
   async pagePaginatePosts(dto: paginatePostDto){
@@ -95,7 +103,7 @@ export class PostsService {
       skip: (dto.page - 1) * dto.take,
       take: dto.take,
       order: {
-        createdAt: dto.order__createAt,
+        createdAt: dto.order__createdAt,
       },
     });
 
@@ -120,7 +128,7 @@ export class PostsService {
     const posts = await this.postsRepository.find({
       where: where,
       order: {
-        createdAt: dto.order__createAt,
+        createdAt: dto.order__createdAt,
       },
       take: dto.take,
     });
@@ -140,7 +148,7 @@ export class PostsService {
       }
   
       // 새로운 where 조건 추가
-      let key = dto.order__createAt === 'ASC' ? 'where__id__more_than' : 'where__id__less_than';
+      let key = dto.order__createdAt === 'ASC' ? 'where__id__more_than' : 'where__id__less_than';
       nextURL.searchParams.append(key, lastItem.id.toString());
     }
   
