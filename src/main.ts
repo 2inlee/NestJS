@@ -12,6 +12,7 @@ async function bootstrap() {
       enableImplicitConversion: true,
     },
     whitelist : true,
+    forbidNonWhitelisted: true,
   }));
 
   await app.listen(3000);
