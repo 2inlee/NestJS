@@ -137,7 +137,7 @@ export class CommonService {
       else if(key.startsWith('order__')){
         order = {
           ...order,
-          ...this.parseOrderFilter<T>(key, value),
+          ...this.parseWhereFilter<T>(key, value),
         }
       }
     }
@@ -212,7 +212,12 @@ export class CommonService {
       // }else{
       //   options[field] = FILTER_MAPPER[operator](values);
       // }
-      options[field] = FILTER_MAPPER[operator](values);
+
+      if(operator == 'i_like'){
+        options[field] = FILTER_MAPPER[operator](`%${value}%`);
+      }else{
+        options[field] = FILTER_MAPPER[operator](value);
+      }
 
     }
 
