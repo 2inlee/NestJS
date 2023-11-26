@@ -7,7 +7,7 @@ export class paginatePostDto extends BasePaginationDto{
   @IsOptional()
   where__likeCount__more_than: number;
 
-  @IsString()
-  @IsOptional()
-  where__title_i_like: string;
-}
+  // @IsString()
+  // @IsOptional()
+  // where__title_i_like: string;
+}  

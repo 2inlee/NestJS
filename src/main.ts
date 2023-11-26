@@ -11,6 +11,7 @@ async function bootstrap() {
     transformOptions: {
       enableImplicitConversion: true,
     },
+    whitelist : true,
   }));
 
   await app.listen(3000);
