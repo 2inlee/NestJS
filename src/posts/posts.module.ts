@@ -12,6 +12,7 @@ import * as multer from 'multer';
 import { POST_IMAGE_PATH } from 'src/common/const/path.const';
 import {v4 as uuid} from 'uuid';
 import { ImageModel } from 'src/common/entity/image.entity';
+import { PostImagesService } from './image/dto/image.service';
 
 
 @Module({
@@ -25,6 +26,6 @@ import { ImageModel } from 'src/common/entity/image.entity';
     CommonModule,
     ],
   controllers: [PostsController],
-  providers: [PostsService],
+  providers: [PostsService, PostImagesService],
 })
 export class PostsModule {}
