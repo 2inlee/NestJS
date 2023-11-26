@@ -7,6 +7,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { paginatePostDto } from './dto/paginate-post.dto';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageModelType } from 'src/common/entity/image.entity';
 
 
 @Controller('posts')
@@ -58,10 +59,22 @@ export class PostsController {
   async postPosts(
     @User('id') userId: number,
     @Body() body: CreatePostDto,
-    @UploadedFile() file?: Express.Multer.File,
   ){
-    await this.postsService.createPostImage(body);
-    return this.postsService.createPost(userId, body);
+    
+    const post = await this.postsService.createPost(
+      userId, body,
+    );
+
+    for(let i =0; i < body.images.length; i++){
+      await this.postsService.createPostImage({
+        post,
+        order: i,
+        path: body.images[i], 
+        type: ImageModelType.POST_IMAGE,
+      });
+    }
+
+    return this.postsService.getPostById(post.id);
   }
 
   // 4) PATCH /posts/:id
