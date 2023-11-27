@@ -8,9 +8,11 @@ import { paginatePostDto } from './dto/paginate-post.dto';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageModelType } from 'src/common/entity/image.entity';
-import { DataSource } from 'typeorm';
+import { DataSource, Transaction, QueryRunner as QR } from 'typeorm';
 import { PostImagesService } from './image/dto/image.service';
 import { LogInterceptor } from 'src/common/interceptor/log.interceptor';
+import { TranscationInterceptor } from 'src/common/interceptor/transaction.interceptor';
+import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 
 
 @Controller('posts')
@@ -64,22 +66,13 @@ export class PostsController {
   // rollback -> 원상복구
   @Post()
   @UseGuards(AccessTokenGuard)
+  @UseInterceptors(TranscationInterceptor)
   async postPosts(
     @User('id') userId: number,
     @Body() body: CreatePostDto,
+    @QueryRunner() qr: QR,
   ){
-    // 트랜잭션과 관련된 모든 쿼리를 담당할 쿼리 러너를 생성한다.
-    const qr = this.dataSource.createQueryRunner();
-
-    // 쿼리러너에 연결한다.
-    await qr.connect();
-    // 쿼리러너에서 트랜잭션을 시작한다.
-    // 이 시점부터 같은 쿼리 러너를 사용하면
-    // 트랜잭션안에서 데이터베이스 액션을 실행 할 수 있다.
-    await qr.startTransaction();
-
     // 로직 실행
-    try{
       const post = await this.postsService.createPost(
         userId, body, qr,
       );
@@ -92,20 +85,7 @@ export class PostsController {
           type: ImageModelType.POST_IMAGE,
         },qr);
       }
-
-    await qr.commitTransaction()
-    await qr.release();
-
-    return this.postsService.getPostById(post.id);
-
-    }catch(e){
-      //어떤 에러든 에러가 던져지면
-      // 트랜잭션을 종료하고 원래 상태로 되돌린다.
-      await qr.rollbackTransaction();
-      await qr.release();
-
-      throw e;
-      }
+    return this.postsService.getPostById(post.id, qr);
   }
 
   // 4) PATCH /posts/:id
