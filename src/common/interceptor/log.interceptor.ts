@@ -12,13 +12,14 @@ export class LogInterceptor implements NestInterceptor {
    * [RES] {요청 path} {응답시간} {얼마나 걸렸는지 ms}
    * 
    */
+  const now = new Date();
+
   const req = context.switchToHttp().getRequest();
 
   // /posts
   // /common/image
   const path = req.originalUrl;
 
-  const now = new Date();
 
   // [REQ] {요청 path} {요청시간}
   console.log(`[REQ] ${path} ${now.toLocaleDateString('kr')}`);
@@ -29,16 +30,7 @@ export class LogInterceptor implements NestInterceptor {
   return next
   .handle().
   pipe(
-    tap((observable)=>console.log(observable),
-    ),
-    map(
-      (observable)=>{
-        return {
-          message: '응답이 변경되었습니다.',
-          response: observable,
-        }
-      }
+    tap((observable)=>console.log(`[RES] ${path} ${new Date().toLocaleDateString('kr')} ${new Date().getMilliseconds() - now.getMilliseconds()}ms`)),
     )
-  )
   }
 }
