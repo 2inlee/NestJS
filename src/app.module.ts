@@ -16,6 +16,7 @@ import { PUBLIC_FOLDER_PATH } from './common/const/path.const';
 import { ImageModel } from './common/entity/image.entity';
 import { ChatsModule } from './chats/chats.module';
 import { ChatsModel } from './chats/entity/chats.entity';
+import { MessageModel } from './chats/messages/entity/messages.entity';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ChatsModel } from './chats/entity/chats.entity';
         UsersModel,
         ImageModel,
         ChatsModel,
+        MessageModel,
       ],
       synchronize: true,
     }),
