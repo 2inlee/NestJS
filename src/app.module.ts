@@ -15,6 +15,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { PUBLIC_FOLDER_PATH } from './common/const/path.const';
 import { ImageModel } from './common/entity/image.entity';
 import { ChatsModule } from './chats/chats.module';
+import { ChatsModel } from './chats/entity/chats.entity';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ChatsModule } from './chats/chats.module';
         PostsModel,
         UsersModel,
         ImageModel,
+        ChatsModel,
       ],
       synchronize: true,
     }),

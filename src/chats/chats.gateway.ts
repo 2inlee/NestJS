@@ -1,17 +1,30 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
+import { CreateChatDto } from "./dto/create-chat.dto";
+import { ChatsService } from "./chats.service";
 
 @WebSocketGateway({
   //ws://localhost:3000/chats
     namespace: '/chats'
 })
 export class ChatsGateway implements OnGatewayConnection{
+  constructor(
+    private readonly chatsService: ChatsService,
+  ) { }
 
   @WebSocketServer()
   server: Server;
 
   handleConnection(socket: Socket) {
     console.log('New connection', socket.id);
+  }
+
+  @SubscribeMessage('create_chat')
+  async createChat(
+    @MessageBody() data: CreateChatDto,
+    @ConnectedSocket() socket: Socket
+  ){
+    const chat = await this.chatsService.createChat(data);
   }
 
   @SubscribeMessage('enter_chat')
