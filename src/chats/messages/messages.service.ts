@@ -1,24 +1,44 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { MessageModel } from "./entity/messages.entity";
+import { MessagesModel } from "./entity/messages.entity";
 import { FindManyOptions, Repository } from "typeorm";
 import { CommonService } from "src/common/common.service";
 import { BasePaginationDto } from "src/common/dto/base-pagination.dto";
+import { CreateMessagesDto } from "./dto/create-messages.dto";
 
 @Injectable()
 export class ChatMssagesService{
   constructor(
-    @InjectRepository(MessageModel)
-    private readonly messagesRepository: Repository<MessageModel>,
+    @InjectRepository(MessagesModel)
+    private readonly messagesRepository: Repository<MessagesModel>,
     private readonly commonService: CommonService,
   ) {}
 
-  createChat() {
-     
+  async createMessage(
+     dto: CreateMessagesDto,
+  ){
+    const message = await this.messagesRepository.save({
+      chat: {
+        id: dto.chatId,
+      },
+      author:{
+        id: dto.authorId,
+      },
+      message: dto.message,
+    });
+
+    return this.messagesRepository.findOne({
+      where: {
+        id: message.id
+      },
+      relations: {
+        chat: true,
+      }
+    });
   }
-  paginateChats(
+  paginateMessages(
     dto: BasePaginationDto,
-    overrideFindOptions: FindManyOptions<MessageModel>,
+    overrideFindOptions: FindManyOptions<MessagesModel>,
   ) {
     return this.commonService.paginate(
       dto,

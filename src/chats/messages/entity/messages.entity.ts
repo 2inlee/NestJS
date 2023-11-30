@@ -5,7 +5,7 @@ import { UsersModel } from "src/users/entities/users.entity";
 import { Column, Entity, ManyToOne } from "typeorm";
 
 @Entity()
-export class MessageModel extends BaseModel{
+export class MessagesModel extends BaseModel{
   @ManyToOne(()=> ChatsModel, chat => chat.messages)
   chat: ChatsModel;
 
