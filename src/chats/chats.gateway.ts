@@ -5,6 +5,7 @@ import { ChatsService } from "./chats.service";
 import { EnterChatDto } from "./dto/enter-chat.dto";
 import { CreateMessagesDto } from "./messages/dto/create-messages.dto";
 import { ChatMssagesService } from "./messages/messages.service";
+import { UsePipes, ValidationPipe } from "@nestjs/common";
 
 @WebSocketGateway({
   //ws://localhost:3000/chats
@@ -22,6 +23,16 @@ export class ChatsGateway implements OnGatewayConnection{
   handleConnection(socket: Socket) {
     console.log('New connection', socket.id);
   }
+
+  @UsePipes(new ValidationPipe({
+    transform: true,
+    // 임의로 변환하는걸 가능하게 만들어준다. ex) pagination에서 url파라미터를 number로 생각함
+    transformOptions: {
+      enableImplicitConversion: true,
+    },
+    whitelist : true,
+    forbidNonWhitelisted: true,
+  }))
 
   @SubscribeMessage('create_chat')
   async createChat(
