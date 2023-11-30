@@ -48,6 +48,17 @@ export class ChatsGateway implements OnGatewayConnection{
   }
 
   @SubscribeMessage('enter_chat')
+  @UseFilters(SocketCatchHttpExceptionFilter)
+  @UsePipes(new ValidationPipe({
+    transform: true,
+    // 임의로 변환하는걸 가능하게 만들어준다. ex) pagination에서 url파라미터를 number로 생각함
+    transformOptions: {
+      enableImplicitConversion: true,
+    },
+    whitelist : true,
+    forbidNonWhitelisted: true,
+  }))
+  @UseGuards(SocketBearerTokenGuard)
   enterChat(
     @MessageBody() data: EnterChatDto,
     @ConnectedSocket() socket: Socket
@@ -69,9 +80,20 @@ export class ChatsGateway implements OnGatewayConnection{
 
   // socket.on('send_message', (message) => { console.log(message)});
   @SubscribeMessage('send_message')
+  @UseFilters(SocketCatchHttpExceptionFilter)
+  @UsePipes(new ValidationPipe({
+    transform: true,
+    // 임의로 변환하는걸 가능하게 만들어준다. ex) pagination에서 url파라미터를 number로 생각함
+    transformOptions: {
+      enableImplicitConversion: true,
+    },
+    whitelist : true,
+    forbidNonWhitelisted: true,
+  }))
+  @UseGuards(SocketBearerTokenGuard)
   async sendMessage(
     @MessageBody() dto: CreateMessagesDto,
-    @ConnectedSocket() socket: Socket
+    @ConnectedSocket() socket: Socket & {user: UsersModel},
   ) {
 
     const chatExists = await this.chatsService.checkIfChatExists(dto.chatId);
@@ -84,7 +106,10 @@ export class ChatsGateway implements OnGatewayConnection{
       }
     }
 
-    const message = await this.messagesService.createMessage(dto); 
+    const message = await this.messagesService.createMessage(
+      dto,
+      socket.user.id,
+      ); 
     // socket.to - send message to all users in the room except the sender
     socket.to(message.chat.id.toString()).emit('receive_message', message.message);
 

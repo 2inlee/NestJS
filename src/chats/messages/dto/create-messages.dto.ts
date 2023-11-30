@@ -9,6 +9,4 @@ export class CreateMessagesDto extends PickType(MessagesModel,[
   @IsNumber()
   chatId: number;
 
-  @IsNumber()
-  authorId: number;
 }
